@@ -13,7 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 from xgboost import XGBRegressor
 
-from config import BEST_CATBOOST_SAVE_PATH, CAT_FEATURES, MODEL_OUTPUT_DIR, NUM_FEATURES, PLOT_OUTPUT_DIR
+from config import BEST_CB_SAVE_PATH, CAT_FEATURES, MODEL_OUTPUT_DIR, NUM_FEATURES, PLOT_OUTPUT_DIR
 from data import load_xy
 from utils import ensure_dir
 
@@ -77,7 +77,7 @@ def train_tree_models():
     print(search_rf.best_params_)
     rf_scores = print_r2(best_rf, X_train_rf, X_test_rf, y_train_rf, y_test_rf)
     training_summary.append({"Model": "RandomForest", "Best parameters": search_rf.best_params_, **rf_scores})
-    joblib.dump(best_rf, os.path.join(MODEL_OUTPUT_DIR, "rf_zif8_model_current.pkl"))
+    joblib.dump(best_rf, os.path.join(MODEL_OUTPUT_DIR, "best_rf_model.pkl"))
 
     X, y, df_model = load_xy(filter_positive=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=60)
@@ -101,7 +101,7 @@ def train_tree_models():
     print(search_xgb.best_params_)
     xgb_scores = print_r2(best_xgb, X_train, X_test, y_train, y_test)
     training_summary.append({"Model": "XGBoost", "Best parameters": search_xgb.best_params_, **xgb_scores})
-    joblib.dump(best_xgb, os.path.join(PLOT_OUTPUT_DIR, "xgb_zif8_model_current.pkl"))
+    joblib.dump(best_xgb, os.path.join(MODEL_OUTPUT_DIR, "best_xgb_model.pkl"))
 
     preprocessor = ColumnTransformer([("num_std", StandardScaler(), NUM_FEATURES)], remainder="passthrough")
     cat_features_idx = list(range(len(NUM_FEATURES), len(NUM_FEATURES) + len(CAT_FEATURES)))
@@ -114,14 +114,14 @@ def train_tree_models():
     pipe_cat = Pipeline([("pre", preprocessor), ("reg", CatBoostRegressor(iterations=200, random_seed=42, verbose=False, thread_count=-1))])
     search_cat = RandomizedSearchCV(pipe_cat, param_dist_cat, n_iter=100, scoring="r2", cv=KFold(n_splits=5, shuffle=True, random_state=42), n_jobs=-1, verbose=0, random_state=42)
     search_cat.fit(X_train, y_train, reg__cat_features=cat_features_idx)
-    best_catboost_model = search_cat.best_estimator_
+    best_cb_model = search_cat.best_estimator_
     print("\nCatBoost best parameters:")
     print(search_cat.best_params_)
-    cat_scores = print_r2(best_catboost_model, X_train, X_test, y_train, y_test)
+    cat_scores = print_r2(best_cb_model, X_train, X_test, y_train, y_test)
     training_summary.append({"Model": "CatBoost", "Best parameters": search_cat.best_params_, **cat_scores})
-    joblib.dump(best_catboost_model, BEST_CATBOOST_SAVE_PATH)
-    print(f"\nCurrent CatBoost model saved to: {BEST_CATBOOST_SAVE_PATH}")
+    joblib.dump(best_cb_model, BEST_CB_SAVE_PATH)
+    print(f"\nBest CatBoost model saved to: {BEST_CB_SAVE_PATH}")
 
     training_summary_df = pd.DataFrame(training_summary)
     training_summary_df.to_excel(os.path.join(PLOT_OUTPUT_DIR, "tree_model_training_r2_summary.xlsx"), index=False)
-    return best_catboost_model, X, X_train, training_summary_df
+    return best_cb_model, X, X_train, training_summary_df

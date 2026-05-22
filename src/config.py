@@ -10,7 +10,7 @@ PLOT_OUTPUT_DIR = OUTPUT_DIR / "figures"
 MODEL_OUTPUT_DIR = OUTPUT_DIR / "models"
 SHAP_OUTPUT_DIR = PLOT_OUTPUT_DIR / "SHAP_Normalized"
 DEPENDENCE_OUTPUT_DIR = PLOT_OUTPUT_DIR / "Dependence"
-BEST_CATBOOST_SAVE_PATH = MODEL_OUTPUT_DIR / "catboost_zif8_best.pkl"
+BEST_CB_SAVE_PATH = MODEL_OUTPUT_DIR / "best_cb_model.pkl"
 
 NUM_FEATURES = ["C2-HmIm/CZn", "CZn", "Solvent volume", "Temperature", "Reaction time"]
 CAT_FEATURES = ["Solvent type", "Stirring"]

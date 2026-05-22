@@ -24,7 +24,7 @@ from plotting import style_axes
 from utils import ensure_dir, shap_label
 
 
-def run_catboost_shap(best_catboost_model, X, X_train):
+def run_catboost_shap(best_cb_model, X, X_train):
     if shap is None:
         raise ImportError("Please install shap first: pip install shap")
 
@@ -35,7 +35,7 @@ def run_catboost_shap(best_catboost_model, X, X_train):
     plt.rcParams["mathtext.rm"] = "Arial"
     plt.rcParams["mathtext.it"] = "Arial"
 
-    preprocessor, model = best_catboost_model.named_steps["pre"], best_catboost_model.named_steps["reg"]
+    preprocessor, model = best_cb_model.named_steps["pre"], best_cb_model.named_steps["reg"]
     all_features = list(X.columns)
     X_proc = preprocessor.transform(X)
     explainer = shap.TreeExplainer(model)

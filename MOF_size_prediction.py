@@ -27,9 +27,9 @@ set_config(transform_output="pandas")
 warnings.filterwarnings("ignore")
 
 
-def run_experimental_validation(best_catboost_model):
+def run_experimental_validation(best_cb_model):
     new_data = experimental_validation_data()
-    predictions = best_catboost_model.predict(new_data[NUM_FEATURES + CAT_FEATURES])
+    predictions = best_cb_model.predict(new_data[NUM_FEATURES + CAT_FEATURES])
 
     print("\n" + "=" * 60)
     print(f"{'Recipe':<8} | {'Solvent':<10} | {'Stirring':<10} | {'Predicted Size (nm)':<20}")
@@ -39,7 +39,7 @@ def run_experimental_validation(best_catboost_model):
     print("=" * 60)
 
     new_data["Predicted_Size_nm"] = predictions
-    new_data.to_excel(os.path.join(PLOT_OUTPUT_DIR, "ZIF8_experimental_validation_predictions_current_catboost.xlsx"), index=False)
+    new_data.to_excel(os.path.join(PLOT_OUTPUT_DIR, "ZIF8_experimental_validation_predictions_best_cb.xlsx"), index=False)
     return new_data
 
 
@@ -48,14 +48,14 @@ def main():
     plot_database_distribution()
 
     print("Step 2/4: tree-model hyperparameter tuning")
-    best_catboost_model, X, X_train, training_summary_df = train_tree_models()
+    best_cb_model, X, X_train, training_summary_df = train_tree_models()
     display_table(training_summary_df[["Model", "Best parameters", "Train R2", "Test R2"]])
 
     print("Step 3/4: CatBoost SHAP analysis")
-    run_catboost_shap(best_catboost_model, X, X_train)
+    run_catboost_shap(best_cb_model, X, X_train)
 
-    print("Step 4/4: experimental-validation prediction")
-    run_experimental_validation(best_catboost_model)
+    print("Step 4/4: experimental-validation prediction using the best CatBoost model")
+    run_experimental_validation(best_cb_model)
 
 
 if __name__ == "__main__":
