@@ -3,7 +3,7 @@ from pathlib import Path
 from matplotlib.colors import LinearSegmentedColormap
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-FILE_PATH = PROJECT_ROOT / "data" / "raw" / "ZIF-8_database.xlsx"
+FILE_PATH = PROJECT_ROOT / "database" / "ZIF-8_database.xlsx"
 SHEET_NAME = "Sheet1"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
 PLOT_OUTPUT_DIR = OUTPUT_DIR / "figures"
