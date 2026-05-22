@@ -111,9 +111,9 @@ def train_tree_models():
         "reg__l2_leaf_reg": [round(x, 1) for x in np.linspace(1.0, 10.0, 10)],
         "reg__bagging_temperature": [round(x, 1) for x in np.linspace(0.0, 2.0, 5)],
     }
-    pipe_cat = Pipeline([("pre", preprocessor), ("reg", CatBoostRegressor(iterations=200, random_seed=42, verbose=False, cat_features=cat_features_idx, thread_count=-1))])
+    pipe_cat = Pipeline([("pre", preprocessor), ("reg", CatBoostRegressor(iterations=200, random_seed=42, verbose=False, thread_count=-1))])
     search_cat = RandomizedSearchCV(pipe_cat, param_dist_cat, n_iter=100, scoring="r2", cv=KFold(n_splits=5, shuffle=True, random_state=42), n_jobs=-1, verbose=0, random_state=42)
-    search_cat.fit(X_train, y_train)
+    search_cat.fit(X_train, y_train, reg__cat_features=cat_features_idx)
     best_catboost_model = search_cat.best_estimator_
     print("\nCatBoost best parameters:")
     print(search_cat.best_params_)
